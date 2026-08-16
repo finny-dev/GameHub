@@ -1965,6 +1965,10 @@ async function getFolderSize(folderPath) {
     UPDATE HANDLER
 */
 ipcMain.handle(
+    "get-app-version",
+    () => app.getVersion()
+);
+ipcMain.handle(
     "download-update",
     async () => {
 
@@ -3828,13 +3832,37 @@ function setupUpdater() {
         }
     );
 
+    log.info(
+        "GameHub version:",
+        app.getVersion()
+    );
+
+    autoUpdater
+        .checkForUpdates()
+        .then(result => {
+
+            log.info(
+                "Update check result:",
+                result
+            );
+
+        })
+        .catch(error => {
+
+            log.error(
+                "Update check failed:",
+                error
+            );
+
+        });
+
 
     autoUpdater.on(
         "update-available",
         info => {
 
-            console.log(
-                "Update available:",
+            log.info(
+                "UPDATE AVAILABLE:",
                 info.version
             );
 
