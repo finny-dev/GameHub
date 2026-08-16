@@ -1731,6 +1731,157 @@ const cleanerTotalSize =
         "cleanerTotalSize"
     );
 
+const updateModal =
+    document.getElementById(
+        "updateModal"
+    );
+
+const updateTitle =
+    document.getElementById(
+        "updateTitle"
+    );
+
+const updateMessage =
+    document.getElementById(
+        "updateMessage"
+    );
+
+const updateActionBtn =
+    document.getElementById(
+        "updateActionBtn"
+    );
+
+const updateLaterBtn =
+    document.getElementById(
+        "updateLaterBtn"
+    );
+
+const updateProgressContainer =
+    document.getElementById(
+        "updateProgressContainer"
+    );
+
+const updateProgressFill =
+    document.getElementById(
+        "updateProgressFill"
+    );
+
+const updateProgressText =
+    document.getElementById(
+        "updateProgressText"
+    );
+
+let updateReadyToInstall = false;
+
+
+window.gamehub.onUpdateAvailable(
+    data => {
+
+        updateModal.classList.remove(
+            "hidden"
+        );
+
+        updateTitle.textContent =
+            "Update Available";
+
+        updateMessage.textContent =
+            `GameHub ${data.version} is available.`;
+
+        updateActionBtn.textContent =
+            "Download Update";
+
+        updateReadyToInstall = false;
+    }
+);
+
+updateActionBtn.addEventListener(
+    "click",
+    async () => {
+
+        if (updateReadyToInstall) {
+
+            window.gamehub.installUpdate();
+            return;
+
+        }
+
+        updateActionBtn.disabled = true;
+
+        updateActionBtn.textContent =
+            "Downloading...";
+
+        updateProgressContainer.classList.remove(
+            "hidden"
+        );
+
+        await window.gamehub.downloadUpdate();
+
+    }
+);
+
+window.gamehub.onUpdateProgress(
+    data => {
+
+        const percent =
+            data.percent || 0;
+
+        updateProgressFill.style.width =
+            `${percent}%`;
+
+        updateProgressText.textContent =
+            `${percent}%`;
+    }
+);
+
+window.gamehub.onUpdateDownloaded(
+    data => {
+
+        updateReadyToInstall = true;
+
+        updateTitle.textContent =
+            "Update Ready";
+
+        updateMessage.textContent =
+            `GameHub ${data.version} is ready to install.`;
+
+        updateActionBtn.disabled =
+            false;
+
+        updateActionBtn.textContent =
+            "Restart & Install";
+
+        updateProgressFill.style.width =
+            "100%";
+
+        updateProgressText.textContent =
+            "100%";
+    }
+);
+updateLaterBtn.addEventListener(
+    "click",
+    () => {
+
+        updateModal.classList.add(
+            "hidden"
+        );
+    }
+);
+window.gamehub.onUpdateError(
+    error => {
+
+        updateActionBtn.disabled =
+            false;
+
+        updateTitle.textContent =
+            "Update Failed";
+
+        updateMessage.textContent =
+            error;
+
+        updateActionBtn.textContent =
+            "Try Again";
+    }
+);
 /*
     INITIAL SCAN
 */

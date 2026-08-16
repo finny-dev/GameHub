@@ -20,4 +20,47 @@ contextBridge.exposeInMainWorld("gamehub", {
     addCleanerFolder: () => ipcRenderer.invoke("add-cleaner-folder"),
     cleanFolders: targetIds => ipcRenderer.invoke("clean-folders", targetIds),
     removeCleanerFolder: targetId => ipcRenderer.invoke("remove-cleaner-folder", targetId),
+
+    // update handlers
+    downloadUpdate: () => ipcRenderer.invoke("download-update"),
+    installUpdate: () => ipcRenderer.send("install-update"),
+    onUpdateAvailable: callback =>
+        ipcRenderer.on(
+            "update-available",
+            (
+                event,
+                data
+            ) =>
+                callback(data)
+        ),
+
+    onUpdateProgress: callback =>
+        ipcRenderer.on(
+            "update-progress",
+            (
+                event,
+                data
+            ) =>
+                callback(data)
+        ),
+
+    onUpdateDownloaded: callback =>
+        ipcRenderer.on(
+            "update-downloaded",
+            (
+                event,
+                data
+            ) =>
+                callback(data)
+        ),
+
+    onUpdateError: callback =>
+        ipcRenderer.on(
+            "update-error",
+            (
+                event,
+                error
+            ) =>
+                callback(error)
+        ),
 });

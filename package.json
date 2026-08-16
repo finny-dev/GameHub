@@ -1,6 +1,6 @@
 {
   "name": "gamehub",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "GameHub - Your gaming PC, organised.",
   "main": "main.js",
   "scripts": {
@@ -22,7 +22,7 @@
       {
         "provider": "github",
         "owner": "finny-dev",
-        "repo": "YOUR_REPO_NAME"
+        "repo": "GameHub"
       }
     ]
   },

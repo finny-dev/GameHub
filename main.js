@@ -17,10 +17,18 @@ const defaultSettings = {
     startWithWindows: false,
     minimizeToTray: false
 };
+const {
+    autoUpdater
+} = require(
+    "electron-updater"
+);
 let mainWindow = null;
 let tray = null;
 let isQuitting = false;
 let windowSaveTimeout = null;
+
+autoUpdater.autoDownload = false;
+autoUpdater.autoInstallOnAppQuit = false;
 
 function getSavedWindowBounds() {
 
@@ -1953,10 +1961,51 @@ async function getFolderSize(folderPath) {
 
     return totalSize;
 }
+/*
+    UPDATE HANDLER
+*/
+ipcMain.handle(
+    "download-update",
+    async () => {
 
+        try {
+
+            await autoUpdater.downloadUpdate();
+
+            return {
+                success: true
+            };
+
+        } catch (error) {
+
+            return {
+                success: false,
+                error:
+                    error.message
+            };
+
+        }
+
+    }
+);
+ipcMain.on(
+    "install-update",
+    () => {
+
+        isQuitting = true;
+
+        autoUpdater.quitAndInstall(
+            false,
+            true
+        );
+
+    }
+);
 /*
     DETECT ALL GAMES
 */
+
+
 
 ipcMain.handle(
     "detect-games",
@@ -3759,6 +3808,116 @@ ipcMain.handle(
     }
 );
 
+function setupUpdater() {
+
+    if (!app.isPackaged) {
+        console.log(
+            "Updater disabled in development mode."
+        );
+
+        return;
+    }
+
+
+    autoUpdater.on(
+        "checking-for-update",
+        () => {
+            console.log(
+                "Checking for GameHub updates..."
+            );
+        }
+    );
+
+
+    autoUpdater.on(
+        "update-available",
+        info => {
+
+            console.log(
+                "Update available:",
+                info.version
+            );
+
+            mainWindow?.webContents.send(
+                "update-available",
+                {
+                    version:
+                        info.version
+                }
+            );
+
+        }
+    );
+
+
+    autoUpdater.on(
+        "update-not-available",
+        () => {
+
+            console.log(
+                "GameHub is up to date."
+            );
+
+        }
+    );
+
+
+    autoUpdater.on(
+        "download-progress",
+        progress => {
+
+            mainWindow?.webContents.send(
+                "update-progress",
+                {
+                    percent:
+                        Math.round(
+                            progress.percent
+                        )
+                }
+            );
+
+        }
+    );
+
+
+    autoUpdater.on(
+        "update-downloaded",
+        info => {
+
+            mainWindow?.webContents.send(
+                "update-downloaded",
+                {
+                    version:
+                        info.version
+                }
+            );
+
+        }
+    );
+
+
+    autoUpdater.on(
+        "error",
+        error => {
+
+            console.error(
+                "Updater error:",
+                error
+            );
+
+            mainWindow?.webContents.send(
+                "update-error",
+                error.message
+            );
+
+        }
+    );
+
+
+    autoUpdater.checkForUpdates();
+
+}
+
 app.whenReady().then(() => {
     Menu.setApplicationMenu(null);
     const settings =
@@ -3769,6 +3928,7 @@ app.whenReady().then(() => {
 
     createWindow();
     createTray();
+    setupUpdater();
 
     app.on(
         "activate",
