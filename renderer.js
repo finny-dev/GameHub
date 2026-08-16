@@ -1882,6 +1882,25 @@ window.gamehub.onUpdateError(
             "Try Again";
     }
 );
+const appVersion =
+    document.getElementById(
+        "appVersion"
+    );
+
+if (appVersion) {
+
+    window.gamehub
+        .getAppVersion()
+        .then(
+            version => {
+
+                appVersion.textContent =
+                    `GameHub v${version}`;
+
+            }
+        );
+
+}
 /*
     INITIAL SCAN
 */

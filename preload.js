@@ -63,4 +63,8 @@ contextBridge.exposeInMainWorld("gamehub", {
             ) =>
                 callback(error)
         ),
+    getAppVersion: () =>
+        ipcRenderer.invoke(
+            "get-app-version"
+        ),
 });
