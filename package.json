@@ -1,6 +1,6 @@
 {
   "name": "gamehub",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "GameHub - Your gaming PC, organised.",
   "main": "main.js",
   "scripts": {
