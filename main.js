@@ -22,6 +22,11 @@ const {
 } = require(
     "electron-updater"
 );
+const log = require("electron-log/main");
+log.initialize();
+autoUpdater.logger = log;
+autoUpdater.logger.transports.file.level = "info";
+log.info("MAIN PROCESS STARTED");
 let mainWindow = null;
 let tray = null;
 let isQuitting = false;
